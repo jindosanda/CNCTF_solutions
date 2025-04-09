@@ -1,0 +1,7 @@
+version: '3'
+services:
+  packet-reassembler:
+    build: .
+    ports:
+      - "31204:31204"
+    restart: unless-stopped

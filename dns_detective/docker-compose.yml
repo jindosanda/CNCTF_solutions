@@ -1,0 +1,7 @@
+version: '3'
+services:
+  dns-challenge:
+    build: .
+    ports:
+      - "31100:31100/udp"
+    restart: unless-stopped

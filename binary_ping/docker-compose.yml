@@ -1,0 +1,7 @@
+version: '3'
+services:
+  binary-ping-service:
+    build: .
+    ports:
+      - "31101:31101"
+    restart: unless-stopped

@@ -1,0 +1,7 @@
+version: '3'
+services:
+  knock-sum-service:
+    build: .
+    ports:
+      - "31200:31200"
+    restart: unless-stopped

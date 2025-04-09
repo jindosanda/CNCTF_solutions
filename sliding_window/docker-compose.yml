@@ -1,0 +1,7 @@
+version: '3'
+services:
+  sliding-window-service:
+    build: .
+    ports:
+      - "31203:31203"
+    restart: unless-stopped
