@@ -1,0 +1,6 @@
+version: '3'
+services:
+  state_secrets:
+    build: .
+    ports:
+      - "31221:31221"
