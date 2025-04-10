@@ -23,7 +23,7 @@ def handle_client(conn, addr):
     target_payload = b"seek_and_ack"
     target_type = 0x42
     ack_type = 0xAA
-    ack_timeout = 15
+    ack_timeout = 100
     
     try:
         conn.settimeout(ack_timeout)
@@ -51,8 +51,10 @@ def handle_client(conn, addr):
                 return
 
         # Aspetta ACK dal client
+        print(f"[+] Waiting for ACK from {addr}")
         try:
             data = conn.recv(1024)
+            print(f"[DEBUG] Received data from {addr}: {data}")
             if len(data) < 4:
                 return
 

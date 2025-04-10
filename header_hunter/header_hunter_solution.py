@@ -1,17 +1,10 @@
 import socket
 import struct
 
-HOST = "ctf.computernetworking.usi.ch"
+HOST = "0.0.0.0"  # oppure "ctf.computernetworking.usi.ch"
 PORT = 31211
 TARGET_TYPE = 0x42
 ACK_TYPE = 0xAA
-
-def parse_packet(data):
-    if len(data) < 4:
-        return None, None, None
-    version, ptype, length = struct.unpack(">BBH", data[:4])
-    payload = data[4:4+length]
-    return version, ptype, payload
 
 def build_ack(payload):
     length = len(payload)
@@ -19,27 +12,31 @@ def build_ack(payload):
     return header + payload
 
 with socket.create_connection((HOST, PORT)) as s:
+    s.settimeout(2)  # timeout di ricezione
     buffer = b""
     target_payload = None
 
-    while True:
-        chunk = s.recv(1024)
-        if not chunk:
-            break
-        buffer += chunk
+    try:
+        while True:
+            chunk = s.recv(1024)
+            if not chunk:
+                break
+            buffer += chunk
 
-        while len(buffer) >= 4:
-            version, ptype, length = struct.unpack(">BBH", buffer[:4])
-            if len(buffer) < 4 + length:
-                break  # aspetta altri dati
+            while len(buffer) >= 4:
+                version, ptype, length = struct.unpack(">BBH", buffer[:4])
+                if len(buffer) < 4 + length:
+                    break  # aspetta altri dati
 
-            payload = buffer[4:4+length]
-            print(f"[DEBUG] Received packet type=0x{ptype:02X}, length={length}, payload={payload}")
+                payload = buffer[4:4+length]
+                print(f"[DEBUG] Received packet type=0x{ptype:02X}, length={length}, payload={payload}")
 
-            if ptype == TARGET_TYPE:
-                target_payload = payload
+                if ptype == TARGET_TYPE:
+                    target_payload = payload
 
-            buffer = buffer[4+length:]
+                buffer = buffer[4+length:]
+    except socket.timeout:
+        print("[✓] Packet stream ended (timeout)")
 
     if target_payload:
         print(f"[✓] Sending ACK for target payload: {target_payload}")
@@ -49,7 +46,7 @@ with socket.create_connection((HOST, PORT)) as s:
         try:
             flag = s.recv(1024).decode(errors="ignore")
             print(f"[🎉] Flag: {flag.strip()}")
-        except Exception as e:
-            print(f"[!] Error receiving flag: {e}")
+        except socket.timeout:
+            print("[!] Server did not respond in time.")
     else:
         print("[✗] Target packet not found")
