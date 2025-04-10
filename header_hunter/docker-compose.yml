@@ -1,0 +1,6 @@
+version: '3'
+services:
+  header_hunter:
+    build: .
+    ports:
+      - "31211:31211"
