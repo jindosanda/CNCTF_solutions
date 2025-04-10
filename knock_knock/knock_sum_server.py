@@ -1,11 +1,22 @@
 import socket
 import threading
+import base64
 import random
+import os
+from dotenv import load_dotenv
+
+load_dotenv()
 
 HOST = "0.0.0.0"
 PORT = 31200
-FLAG = "CTF{simple_sum_solved}"
+FLAG = os.getenv("FLAG")
 TIMEOUT_SECONDS = 3
+
+def encode_b64(msg):
+    return base64.b64encode(msg.encode()).decode()
+
+def decode_b64(msg):
+    return base64.b64decode(msg.encode()).decode()
 
 def handle_client(conn, addr):
     print(f"[+] Connection from {addr}")
@@ -17,13 +28,20 @@ def handle_client(conn, addr):
             return
 
         a, b = random.randint(10, 99), random.randint(10, 99)
-        conn.sendall(f"What is {a} + {b}?\n".encode())
+        challenge = f"{a} + {b}"
+        encoded_challenge = encode_b64(challenge)
+        conn.sendall(f"Solve this: {encoded_challenge}\n".encode())
 
         answer = conn.recv(1024).decode().strip()
-        if answer == str(a + b):
-            conn.sendall(f"{FLAG}\n".encode())
-        else:
-            conn.sendall(b"Wrong answer!\n")
+        try:
+            decoded = decode_b64(answer)
+            if int(decoded) == a + b:
+                conn.sendall(f"{FLAG}\n".encode())
+            else:
+                conn.sendall(b"Wrong answer!\n")
+        except Exception:
+            conn.sendall(b"Invalid response!\n")
+
     except socket.timeout:
         conn.sendall(b"Too slow!\n")
     except Exception as e:
