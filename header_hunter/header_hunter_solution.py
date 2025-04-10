@@ -1,7 +1,7 @@
 import socket
 import struct
 
-HOST = "0.0.0.0"  # oppure "ctf.computernetworking.usi.ch"
+HOST = "ctf.computernetworking.usi.ch"
 PORT = 31211
 TARGET_TYPE = 0x42
 ACK_TYPE = 0xAA
