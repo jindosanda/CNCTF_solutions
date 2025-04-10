@@ -4,6 +4,7 @@ import struct
 import random
 import os
 from dotenv import load_dotenv
+import time
 
 # Carica variabili da .env
 load_dotenv()
@@ -37,6 +38,7 @@ def handle_client(conn, addr):
 
         # Invia tutti i pacchetti
         for pkt in packets:
+            time.sleep(random.uniform(0.05, 0.2))
             conn.sendall(pkt)
 
     except Exception as e:
