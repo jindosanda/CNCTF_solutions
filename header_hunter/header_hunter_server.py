@@ -2,10 +2,15 @@ import socket
 import threading
 import struct
 import random
+import os
+from dotenv import load_dotenv
+
+# Carica variabili da .env
+load_dotenv()
 
 HOST = "0.0.0.0"
 PORT = 31211
-FLAG = b"CTF{header_hunter}"
+FLAG = os.getenv("FLAG", "CTF{default_flag}").encode()
 
 def generate_packet(version, ptype, payload):
     length = len(payload)
@@ -18,10 +23,10 @@ def handle_client(conn, addr):
         conn.settimeout(10)
         packets = []
 
-        # Insert flag packet at random position
+        # Inserisce il pacchetto contenente la flag in una posizione casuale
         flag_packet = generate_packet(0x01, 0xFF, FLAG)
         flag_position = random.randint(0, 29)
-        
+
         for i in range(30):
             if i == flag_position:
                 packets.append(flag_packet)
@@ -30,6 +35,7 @@ def handle_client(conn, addr):
                 pkt = generate_packet(0x01, random.randint(0x00, 0xFE), dummy_payload)
                 packets.append(pkt)
 
+        # Invia tutti i pacchetti
         for pkt in packets:
             conn.sendall(pkt)
 
