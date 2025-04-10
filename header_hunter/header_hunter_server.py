@@ -10,7 +10,7 @@ load_dotenv()
 
 HOST = "0.0.0.0"
 PORT = 31211
-FLAG = os.getenv("FLAG", "CTF{default_flag}").encode()
+FLAG = os.getenv("FLAG").encode()
 
 def generate_packet(version, ptype, payload):
     length = len(payload)
