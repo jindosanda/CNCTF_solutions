@@ -62,9 +62,11 @@ def handle_client(conn, addr):
             payload = data[4:4+length]
 
             if ptype == ack_type and payload == target_payload:
+                time.sleep(random.uniform(0.05, 0.15))
                 print(f"[✓] Correct ACK received from {addr}")
                 conn.sendall(flag_packet)
             else:
+                time.sleep(random.uniform(0.05, 0.15))
                 print(f"[✗] Invalid ACK from {addr}")
                 conn.sendall(b"Wrong ACK\n")
 
