@@ -62,9 +62,17 @@ def handle_client(conn, addr):
                     services = b"DNS,HTTP,FLAG"
                     conn.sendall(build_packet(0x12, services))
                     step += 1
-                elif step == 3 and ptype == 0x04 and payload == b"flag":
-                    conn.sendall(build_packet(0xFF, FLAG))
-                    return
+                elif step == 3 and ptype == 0x04:
+                    if payload.decode().upper() in ["DNS", "HTTP", "FLAG"]:
+                        if payload.lower() == b"flag":
+                            conn.sendall(build_packet(0xFF, FLAG))
+                        else:
+                            conn.sendall(build_packet(0x13, f"Connecting to {payload.decode()}...".encode()))
+                        return
+                    else:
+                        conn.sendall(build_packet(0xEE, b"INVALID SERVICE"))
+                        return
+
                 else:
                     conn.sendall(build_packet(0xEE, b"INVALID"))
                     return
